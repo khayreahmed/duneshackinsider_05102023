@@ -64,6 +64,15 @@ ax.set_zlabel('Deal Size (USD)', fontsize=12)
 ax.locator_params(nbins=4, axis='x')
 ax.locator_params(nbins=5, axis='x')
 
+# Customize zticks
+z_ticks = np.linspace(z.min(), z.max(), 5)  # Change 5 to however many ticks you want
+ax.set_zticks(z_ticks)
+
+# Customize zticklabels
+z_labels = ["${:.1f}M".format(i/1e6) for i in z_ticks]
+# Set the custom labels to the z-axis
+ax.set_zticklabels(z_labels, fontsize=7)  # reduce font size here
+
 # Create images directory if it does not exist
 if not os.path.exists('images'):
     os.makedirs('images')
@@ -71,6 +80,6 @@ if not os.path.exists('images'):
 for ii in np.arange(0, 360, 1):
     ax.view_init(elev=32, azim=ii)
     fig.suptitle('$R^2 = %.2f$' % r2, fontsize=20)
-    fig.tight_layout()
+    plt.subplots_adjust(left=0.1, right=0.9, top=0.9, bottom=0.1)  # adjust the figure layout
     plt.savefig('images/gif_image%d.png' % ii)
 
