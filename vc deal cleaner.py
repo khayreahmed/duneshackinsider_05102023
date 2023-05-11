@@ -27,6 +27,12 @@ for funding in funding_types:
     # Convert index to "Q1 2007" format
     df_funding.index = df_funding.index.to_period('Q').astype(str)
     
+    # Rename the column as "Money Raised Currency (in USD)"
+    df_funding.name = "Money Raised Currency (in USD)"
+    
+    # Convert Series to DataFrame and reset index
+    df_funding = df_funding.reset_index().rename(columns={"index": "Announced Date"})
+    
     # Store the dataframe in the dictionary
     dfs[funding] = df_funding
 
@@ -35,9 +41,13 @@ for funding in funding_types:
 
 # Save each dataframe to an Excel file
 for funding, df_funding in dfs.items():
-    df_funding.to_excel(f'{funding}_quarterly_average.xlsx')
+    df_funding.to_excel(f'{funding}_quarterly_average.xlsx', index=False)
     
 # Now let's create the 'Early Stage' dataframe, which is the average of all funding types
-df_early_stage = pd.concat(dfs.values(), axis=1).mean(axis=1).round()
+df_early_stage = pd.concat([df.set_index("Announced Date") for df in dfs.values()], axis=1).mean(axis=1).round()
 df_early_stage = df_early_stage[df_early_stage.index >= '2007Q1']
-df_early_stage.to_excel('Early_Stage_quarterly_average.xlsx')
+
+# Convert Series to DataFrame, reset index and rename columns
+df_early_stage = df_early_stage.reset_index().rename(columns={0: "Money Raised Currency (in USD)", "index": "Announced Date"})
+
+df_early_stage.to_excel('Early_Stage_quarterly_average.xlsx', index=False)
